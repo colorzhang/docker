@@ -1,0 +1,29 @@
+# Container with Neo4j Server
+# Repository http://github.com/neo4j-contrib/docker-neo4j
+
+FROM java:8
+MAINTAINER Winston Zhang, <winston.zhang@hybris.com>
+
+RUN mkdir /opt/hybris
+
+COPY hybris /opt/hybris/hybris
+RUN cd /opt/hybris/hybris/bin/platform && \
+    chmod +x *.sh && \
+    useradd hybris 
+
+WORKDIR /opt/hybris/hybris/bin/platform
+
+ENV PLATFORM_HOME "/opt/hybris/hybris/bin/platform"
+ENV ANT_OPTS "-Xmx512m -XX:MaxPermSize=128M"
+ENV ANT_HOME $PLATFORM_HOME/apache-ant-1.9.1
+ENV PATH $ANT_HOME/bin:$PLATFORM_HOME:$PATH
+
+RUN ant -Dinput.template=develop -Dmaven.update.dbdrivers=false
+
+COPY config/local.properties /opt/hybris/hybris/config/local.properties
+COPY config/localextensions.xml /opt/hybris/hybris/config/localextensions.xml
+
+# my customized tomcat8 & solrcloud 5.2.1
+COPY config/server.xml /opt/hybris/hybris/config/tomcat/conf/server.xml
+COPY config/embedded /opt/hybris/hybris/config/solr/embedded
+
