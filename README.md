@@ -1,4 +1,4 @@
-# docker
+# Dockerize hybris components and orchestrate with Kubernetes
 
 hybris components docker file
 
